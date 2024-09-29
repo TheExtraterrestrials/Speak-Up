@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import '../styles/ChatPage.css';
 import SendIcon from '@mui/icons-material/Send';
+import ChatIcon from '@mui/icons-material/Chat';
 import MicIcon from '@mui/icons-material/Mic';
 import StopIcon from '@mui/icons-material/Stop';
+import main from './groq'; // Import your groq transcription function
 
 const SpeechRecognition =
   window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -15,7 +17,10 @@ const ChatPage = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isListening, setIsListening] = useState(false);
-  const messagesEndRef = useRef(null); // For autoscroll
+  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [audioChunks, setAudioChunks] = useState([]);
+  const [audioFilePath, setAudioFilePath] = useState(''); // Path for the recorded audio
+  const messagesEndRef = useRef(null);
 
   // Scroll to the bottom whenever messages are updated
   const scrollToBottom = () => {
@@ -52,8 +57,69 @@ const ChatPage = () => {
     setInput('');
   };
 
+  // Function to handle audio recording
+  const startRecording = () => {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream) => {
+        const recorder = new MediaRecorder(stream);
+        setMediaRecorder(recorder);
+
+        recorder.ondataavailable = (event) => {
+          setAudioChunks((prev) => [...prev, event.data]);
+        };
+
+        recorder.start();
+        setIsListening(true);
+      })
+      .catch((error) => console.error('Error accessing microphone', error));
+  };
+
+  const stopRecording = async () => {
+    if (mediaRecorder) {
+      mediaRecorder.stop();
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/m4a' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audioFileName = `audio_${Date.now()}.m4a`;
+
+        let transcription = '';
+        try {
+          transcription = await main(audioBlob); 
+        } catch (error) {
+          console.error('Error during transcription:', error);
+          transcription = 'Transcription failed';
+        }
+
+       
+        setAudioFilePath(audioFileName);
+
+
+        setAudioChunks([]);
+        setIsListening(false);
+
+        
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: `Audio recorded: ${audioFileName}`, sender: 'user' },
+          { text: transcription, sender: 'bot' }, 
+        ]);
+      };
+    }
+  };
+
+  const toggleRecording = () => {
+    if (isListening) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
   return (
+    <div className="chat-page-wrapper">
+    
     <div className="chat-page">
+    <div className="heading"> <p className='name'>SpeakUP</p>   <ChatIcon /></div> 
       <div className="messages">
         {messages.map((message, index) => (
           <div
@@ -75,15 +141,17 @@ const ChatPage = () => {
           onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
         />
         <button onClick={handleSendMessage} className="send-btn">
-          {/* <SendIcon /> */}
+          <SendIcon />
         </button>
         <button
           className={`mic-btn ${isListening ? 'listening' : ''}`}
-          onClick={handleSpeechInput}
+          onClick={toggleRecording}
         >
           {isListening ? <StopIcon /> : <MicIcon />}
         </button>
       </div>
+      {/* {audioFilePath && <p>Recorded audio saved at: {audioFilePath}</p>} */}
+    </div>
     </div>
   );
 };

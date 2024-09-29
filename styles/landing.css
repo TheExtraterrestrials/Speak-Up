@@ -1,9 +1,24 @@
-.page-wrapper {
-    height: 100vh;
-    width: 100vw;
-    color: white;
-}
-video{
+/* Landing Page CSS */
+:root {
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --text-color: #ffffff;
+    --font-main: 'Roboto', sans-serif;
+  }
+  
+  body {
+    margin: 0;
+    font-family: var(--font-main);
+    color: var(--text-color);
+  }
+  
+  .page-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .video {
     position: fixed;
     top: 0;
     left: 0;
@@ -11,48 +26,68 @@ video{
     height: 100%;
     object-fit: cover;
     z-index: -1;
-}
-.landing-main{
+  }
+  
+  .landing-main {
+    flex: 1;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 1.5rem 2.5rem;
-    /* background-color: #000000; */
-    height: calc(100vh - 12vh);
-}
-
-.btn{
-    padding: 0.5rem 1.5rem;
-    background-color: #007bff;
-    color: #fff;
+    padding: 2rem;
+  }
+  
+  .content-divs {
+    max-width: 800px;
+    text-align: center;
+  }
+  
+  .heading {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  
+  .para {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+  
+  .btn {
+    padding: 0.75rem 2rem;
+    background-color: var(--primary-color);
+    color: var(--text-color);
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 1rem;
     font-weight: 600;
     text-transform: uppercase;
-}
-
-.btn:hover{
-    background-color: #0056b3;
-}
-.content-divs{
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    flex-direction: column;
-    padding: 1.5rem 2.5rem;
-    height: calc(100vh - 40vh);
-}
-.para{
-    font-size: 1.2rem;
-    font-weight: 200;
-    text-align: center;
-    width: 70%;
-}
-.heading{
-    font-size: 2rem;
-    font-weight: 600;
-    width: 80%;
-    text-align: center;
-}
+    transition: background-color 0.3s ease;
+  }
+  
+  .btn:hover {
+    background-color: var(--primary-hover);
+  }
+  
+  @media (max-width: 768px) {
+    .heading {
+      font-size: 2.5rem;
+    }
+    
+    .para {
+      font-size: 1rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .heading {
+      font-size: 2rem;
+    }
+    
+    .content-divs {
+      padding: 1rem;
+    }
+  }

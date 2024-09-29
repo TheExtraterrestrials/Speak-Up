@@ -10,9 +10,7 @@ export default function () {
         <div className='nav-links'>
             <ul>
             <li>Home</li>
-            <li>About</li>
-            <li>Services</li>
-            <li>Contact</li>
+            <li>Chat</li>
             </ul>
         </div>
     </div>
